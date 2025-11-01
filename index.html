@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSH Zone - Crypteur Multi-Algorithmes</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-VOTREID"
+     crossorigin="anonymous"></script> 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================== */
+        /* FIX ULTIMATE DES COINS BLANCS ET RESET CSS */
+        /* ============================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; 
+        }
+        
+        html {
+            background-color: #1f2937; 
+            min-height: 100%;
+        }
+        
+        body {
+            min-height: 10vh; 
+            margin: 0 !important; 
+            padding: 0 !important;
+            box-sizing: border-box; 
+            overflow-x: hidden; 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.4s, color 0.4s;
+        }
+
+        /* Configuration des thèmes avec des couleurs plus contrastées */
+        .theme-dark {
+            background-color: #0d1117; 
+            color: #f0f6fc;
+        }
+        .theme-dark .app-bg { color: #f0f6fc; } 
+        .theme-dark .card-bg { 
+            background-color: #161b22; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
+        }
+        .theme-dark .input-bg { 
+            background-color: #21262d; 
+            border-color: #30363d; 
+            color: #f0f6fc; 
+        }
+        .theme-dark .output-bg { 
+            background-color: #0d1117;
+            border-color: #30363d; 
+            color: #c9d1d9; 
+        }
+
+        /* Thème clair amélioré */
+        .theme-light {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .theme-light .card-bg { 
+            background-color: #ffffff; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+        .theme-light .input-bg { background-color: #ffffff; border-color: #d1d5db; color: #111827; }
+        .theme-light .output-bg { background-color: #f3f4f6; border-color: #d1d5db; color: #4b5563; }
+        
+        /* Cartes des autres chiffrements */
+        .other-cipher-card { 
+            background-color: #161b22; 
+            border-color: #30363d; 
+            cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .other-cipher-card:hover {
+            transform: translateY(-4px); 
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); 
+        }
+        .theme-light .other-cipher-card { 
+            background-color: #ffffff; 
+            border-color: #e5e7eb; 
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        .theme-light .other-cipher-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+        }
+
+        /* Carte sélectionnée */
+        .cipher-card-selected {
+            border-color: #06b6d4 !important; 
+            border-width: 3px;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.6) !important; 
+        }
+    </style>
+</head>
+
+<body id="body" class="theme-dark app-bg min-h-screen p-4 sm:p-8">
+
+    <div class="absolute top-4 right-4 z-10">
+        <button id="themeToggle" class="p-3 rounded-full transition duration-300 shadow-xl theme-dark:bg-gray-700 theme-dark:hover:bg-gray-600 theme-light:bg-gray-200 theme-light:hover:bg-gray-300">
+            <svg id="moonIcon" class="h-6 w-6 text-yellow-300" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.914A8.98 8.98 0 0110 18a9 9 0 01-9-9c0-.246.024-.488.07-.728A8.99 8.99 0 0010 18v-8.086z" /></svg>
+            <svg id="sunIcon" class="h-6 w-6 text-yellow-500 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 1.732a1 1 0 01.5.866l.25 1.5a1 1 0 01-1.932.333l-.25-1.5a1 1 0 011.182-.866zM17 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zm-3.268 4.768a1 1 0 01-.866.5l-1.5-.25a1 1 0 01-.333-1.932l1.5.25a1 1 0 01.866 1.182zM10 17a1 1 0 01-1-1v-1a1 1 0 112 0v1a1 1 0 01-1 1zM6 15.268a1 1 0 01-.5-.866l-.25-1.5a1 1 0 011.932.333l.25 1.5a1 1 0 01-1.182.866zM3 10a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1zM6.732 4.732a1 1 0 01.866-.5l1.5.25a1 1 0 01.333 1.932l-1.5-.25a1 1 0 01-.866-1.182z" clip-rule="evenodd" /></svg>
+        </button>
+    </div>
+
+    <div class="card-bg p-6 sm:p-10 rounded-3xl shadow-2xl w-full max-w-5xl m-auto transition duration-400 border border-gray-700/50 theme-light:border-gray-200">
+        
+        <h1 class="text-4xl font-extrabold text-center text-cyan-400 mb-2">
+            BSH <span class="theme-dark:text-white theme-light:text-gray-900">Zone</span>
+        </h1>
+        <p class="text-xl font-medium text-center theme-dark:text-gray-300 theme-light:text-gray-700 mb-8">Crypteur Multi-Algorithmes</p>
+        <p id="cipherDescription" class="text-center theme-dark:text-gray-400 theme-light:text-gray-600 mb-8 font-light">Mode actuel : Chiffrement Vigenère. Cryptez votre texte ou un fichier ZIP avec un mot de passe (clé textuelle).</p>
+
+        <div class="mb-10 text-center bg-gray-700/50 p-3 rounded-lg border border-yellow-500/50 theme-light:bg-gray-100 theme-light:border-yellow-300">
+            <p class="text-xs theme-dark:text-yellow-400 theme-light:text-yellow-700 mb-2 font-semibold">
+                Espace Publicitaire AdSense - Bloc 1 (Responsive)
+            </p>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-VOTREID"
+                 data-ad-slot="VOTRE_SLOTID_1"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        
+        <div class="p-6 border-4 border-cyan-600 rounded-2xl mb-12 shadow-inner shadow-cyan-900/50 theme-light:shadow-cyan-100" id="mainCipherArea">
+            <h2 id="cipherTitle" class="text-2xl font-bold mb-6 theme-dark:text-cyan-300 theme-light:text-cyan-700 text-center sm:text-left">Outil Vigenère</h2>
+
+            <div class="mb-6">
+                <label for="inputText" class="block text-sm font-medium theme-dark:text-gray-300 theme-light:text-gray-700 mb-2">Texte à Crypter / Obfusquer / Encoder</label>
+                <textarea id="inputText" rows="6" class="input-bg w-full p-4 border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 focus:border-cyan-500 transition duration-200 text-lg" placeholder="Tapez ou collez votre message ou code ici..."></textarea>
+            </div>
+
+            <div id="keyInputContainer" class="mb-6">
+                <label id="keyLabel" for="keyInput" class="block text-sm font-medium theme-dark:text-gray-300 theme-light:text-gray-700 mb-2">Mot de Passe (Clé Textuelle)</label>
+                <input type="text" id="keyInput" value="SECRET" class="input-bg w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-cyan-500/50 focus:border-cyan-500 transition duration-200" placeholder="Entrez votre mot de passe ici (ex: BANANA)">
+            </div>
+            
+            <div id="keyInputBContainer" class="mb-6 hidden">
+                <label id="keyLabelB" for="keyInputB" class="block text-sm font-medium theme-dark:text-gray-300 theme-light:text-gray-700 mb-2">Clé Multiplicative (a)</label>
+                <input type="number" id="keyInputB" value="5" min="1" max="25" step="1" class="input-bg w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-cyan-500/50 focus:border-cyan-500 transition duration-200" placeholder="Entrez une clé (a) coprime de 26 (ex: 5, 7, 11, 15, 17, 19, 21, 23, 25)">
+            </div>
+
+
+            <div id="zipUploadContainer" class="mb-6 p-4 rounded-xl border border-dashed theme-dark:border-gray-600 theme-light:border-gray-400 bg-transparent theme-dark:bg-gray-800/20 theme-light:bg-gray-100">
+                <label for="zipFileInput" class="block text-sm font-medium theme-dark:text-gray-300 theme-light:text-gray-700 mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h8l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                    Charger un Fichier ZIP (Facultatif)
+                </label>
+                <input type="file" id="zipFileInput" accept=".zip" class="w-full text-sm theme-dark:text-gray-400 theme-light:text-gray-600
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-indigo-600 file:text-white
+                    hover:file:bg-indigo-700 transition duration-300 shadow-md
+                "/>
+                <p id="zipInfo" class="text-xs mt-3 theme-dark:text-yellow-400 theme-light:text-orange-600 hidden">
+                    ⚠️ **Attention** : Le fichier ZIP est chargé et encodé en **Base64** dans la zone de texte. Le chiffrement s'appliquera sur cette chaîne Base64.
+                </p>
+            </div>
+
+            <div class="flex justify-center mb-6 gap-4">
+                <button id="encryptButton" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 px-6 rounded-xl transition duration-300 shadow-cyan-600/50 shadow-xl hover:shadow-cyan-500/70 transform hover:scale-[1.01] flex items-center justify-center gap-2 text-lg">
+                    Crypter le Message
+                </button>
+            </div>
+
+            <div id="statusMessage" class="h-8 mb-4"></div>
+
+            <div>
+                <label for="outputText" class="block text-sm font-medium theme-dark:text-gray-300 theme-light:text-gray-700 mb-2">Résultat Crypté / Obfusqué / Encodé</label>
+                <textarea id="outputText" rows="6" readonly class="output-bg w-full p-4 border rounded-lg placeholder-gray-500 focus:outline-none cursor-not-allowed transition duration-200 text-base font-mono" placeholder="Le message crypté, obfusqué ou encodé apparaîtra ici..."></textarea>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 mt-4 opacity-0 invisible" id="resultActions">
+                <button id="copyButton" class="w-full sm:w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300 shadow-md transform hover:scale-[1.01] flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M7 6V3a1 1 0 011-1h6a1 1 0 011 1v7h-4a1 1 0 00-1 1v4H8a1 1 0 01-1-1v-4a1 1 0 00-1-1H3a1 1 0 01-1-1V6a1 1 0 011-1h4zM9 16h6V6H9v10z"/>
+                    </svg>
+                    Copier le résultat
+                </button>
+                <button id="downloadButton" class="w-full sm:w-1/2 bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300 shadow-md transform hover:scale-[1.01] flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm5.293-7.707a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 12.414V6a1 1 0 11-2 0v6.414l-1.293-1.293a1 1 0 010-1.414l3-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Télécharger le Résultat
+                </button>
+            </div>
+
+            <div class="mt-10 text-center bg-gray-700/50 p-3 rounded-lg border border-yellow-500/50 theme-light:bg-gray-100 theme-light:border-yellow-300">
+                <p class="text-xs theme-dark:text-yellow-400 theme-light:text-yellow-700 mb-2 font-semibold">
+                    Espace Publicitaire AdSense - Bloc 2 (Carré/Média)
+                </p>
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:300px;height:250px"
+                     data-ad-client="ca-pub-VOTREID"
+                     data-ad-slot="VOTRE_SLOTID_2"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+
+
+        <div class="mt-12">
+            <h2 class="text-3xl font-bold mb-8 text-center theme-dark:text-white theme-light:text-gray-900">Autres Formes de Cryptage / Obfuscation (BSH)</h2>
+
+            <div id="cipherCardsContainer" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6">
+                
+                <div id="Vigenere" class="other-cipher-card cipher-card-selected p-5 rounded-xl border-2 transition duration-300 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="Vigenere">
+                    <h3 class="text-lg font-semibold text-cyan-400 mb-2">Vigenère</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Chiffrement poly-alphabétique avec un mot de passe.</p>
+                    <button class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md">Mode Actif</button>
+                </div>
+
+                <div id="Caesar" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-cyan-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="Caesar">
+                    <h3 class="text-lg font-semibold text-cyan-400 mb-2">César</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Décalage simple des lettres par une valeur fixe.</p>
+                    <button class="w-full bg-cyan-700 hover:bg-cyan-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+
+                <div id="ROT13" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-cyan-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="ROT13">
+                    <h3 class="text-lg font-semibold text-cyan-400 mb-2">ROT13</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Cas spécial de César, décalage fixe de 13 positions.</p>
+                    <button class="w-full bg-cyan-700 hover:bg-cyan-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+                
+                <div id="Affine" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-cyan-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="Affine">
+                    <h3 class="text-lg font-semibold text-cyan-400 mb-2">Affine</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Formule mathématique utilisant deux clés (a et b).</p>
+                    <button class="w-full bg-cyan-700 hover:bg-cyan-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+
+                <div id="Substitution" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-cyan-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="Substitution">
+                    <h3 class="text-lg font-semibold text-cyan-400 mb-2">Substitution</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Chaque lettre est remplacée selon une clé de 26 lettres.</p>
+                    <button class="w-full bg-cyan-700 hover:bg-cyan-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+                
+                <div id="Base64" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-cyan-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="Base64">
+                    <h3 class="text-lg font-semibold text-cyan-400 mb-2">Base64</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Conversion de données binaires en texte ASCII.</p>
+                    <button class="w-full bg-cyan-700 hover:bg-cyan-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+
+                <div id="ObfuscationStringArray" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-indigo-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="ObfuscationStringArray">
+                    <h3 class="text-lg font-semibold text-indigo-400 mb-2">Obfuscation (String Array)</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Méthode style Obfuscator.io : Cache toutes les chaînes dans un tableau codé (noms de variables hexadécimaux).</p>
+                    <button class="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+                
+                <div id="ObfuscationStringArrayPro" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-indigo-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="ObfuscationStringArrayPro">
+                    <h3 class="text-lg font-semibold text-indigo-400 mb-2">Obfuscation String Array Pro 🔒</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">**NOUVEAU** : Obfuscation String Array Avancée, masquant les fonctions **critiques** comme `eval` et `console.log`.</p>
+                    <button class="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+                
+                <div id="ObfuscationCJK" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-indigo-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="ObfuscationCJK">
+                    <h3 class="text-lg font-semibold text-indigo-400 mb-2">Obfuscation (CJK/Unicode) 🇯🇵</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Variables en **caractères illisibles (Chinois/Japonais)** SANS Base64 (code source directement exposé en valeur).</p>
+                    <button class="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+
+                <div id="ObfuscationEncode" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-indigo-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="ObfuscationEncode">
+                    <h3 class="text-lg font-semibold text-indigo-400 mb-2">Obfuscation (Base64 Eval)</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Encodage des chaînes en Base64 et exécution par 'eval' (simple et direct).</p>
+                    <button class="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+                
+                 <div id="ObfuscationDistract" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-indigo-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="ObfuscationDistract">
+                    <h3 class="text-lg font-semibold text-indigo-400 mb-2">Obfuscation (Distraction)</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Ajoute du texte inutile pour simuler la pollution du code et la distraction.</p>
+                    <button class="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+                
+                 <div id="ObfuscationSplit" class="other-cipher-card p-5 rounded-xl border-2 transition duration-300 hover:shadow-indigo-500/50 shadow-lg theme-dark:shadow-gray-900/50" data-cipher="ObfuscationSplit">
+                    <h3 class="text-lg font-semibold text-indigo-400 mb-2">Obfuscation (Split)</h3>
+                    <p class="text-sm theme-dark:text-gray-400 theme-light:text-gray-600 mb-4 h-10 overflow-hidden">Divise la chaîne en caractères individuels, puis les recombine (Array Join).</p>
+                    <button class="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg text-sm font-medium transition duration-200">Utiliser</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- UTILITAIRES D'OBFUSCATION ---
+
+        // Fonction pour créer une chaîne de distraction simulant le Code Mort
+        function createDistractionCode(key, size = 150) {
+            const distraction = "/* START OPAQUE CODE INJECTION - BSH ZONE */\n";
+            let junk = "";
+            const randomChar = '0123456789abcdef';
+
+            for (let i = 0; i < size; i++) {
+                const charBased = key.charAt(i % key.length);
+                junk += `const _0x${Math.floor(Math.random() * 0xFFFF).toString(16)} = '${charBased}' + '${randomChar.charAt(Math.floor(Math.random() * 16))}' + '${Math.random().toFixed(4)}';\n`;
+            }
+
+            return distraction + junk + `/* END OPAQUE CODE INJECTION - KEY HASH: ${key.length * 42} */\n`;
+        }
+
+        // Fonction d'Obfuscation par Division de Chaîne
+        function stringSplitObfuscator(text) {
+            if (!text) return "";
+            const charArray = Array.from(text); 
+            const jsArray = "['" + charArray.join("','") + "']";
+            const obfuscatedCode = `// String Splitting Obfuscation\nconst obfuscatedString = (${jsArray}).join('');\n// L'utilisation est: console.log(obfuscatedString);`;
+            return obfuscatedCode;
+        }
+
+        // Fonction d'encodage Base64 SÉCURISÉE (UTF-8 compatible)
+        function base64EncodeSafe(text) {
+            const utf8 = new TextEncoder().encode(text);
+            const binary = String.fromCharCode.apply(null, utf8);
+            return btoa(binary);
+        }
+
+        // Fonction de DÉCODAGE Base64 SÉCURISÉE (UTF-8 compatible) - Doit être intégrée pour les modes Base64
+        function base64DecodeSafe(base64) {
+            // 1. Décodage Base64 -> Latin1
+            const binaryString = atob(base64);
+            
+            // 2. Conversion Latin1 -> UTF-8 (Décodage correct des caractères spéciaux)
+            const decoded_utf8 = decodeURIComponent(binaryString.split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            
+            return decoded_utf8;
+        }
+
+        // FONCTION Obfuscation de Chaîne de Style Professionnel (String Array - Variables Hexadécimales)
+        function stringArrayObfuscator(text) {
+            if (!text) return "// Entrez du code ou du texte pour commencer l'obfuscation String Array.";
+
+            const originalString = text;
+            const obfuscatedStrings = [
+                'eval', 
+                'log',         
+                'OriginalData',
+                originalString 
+            ];
+
+            const base64EncodedArray = base64EncodeSafe(JSON.stringify(obfuscatedStrings));
+
+            const decoderFunction = `
+// Routine de déchiffrement BSH Zone 
+const _decode_bsh = function() {
+    const _bsh_base64 = "${base64EncodedArray}";
+    try {
+        // La fonction base64DecodeSafe doit exister dans cet environnement
+        const decoded_json_string = base64DecodeSafe(_bsh_base64); 
+        return JSON.parse(decoded_json_string);
+    } catch (e) {
+        // En cas d'erreur: renvoie un tableau d'erreur
+        return ['ArrayError','ArrayError','ArrayError', 'ArrayError'];
+    }
+};
+
+const _bsh_dict = _decode_bsh();
+
+// Le "wrapper" pour accéder aux chaînes par index
+const _bsh_g = function(index) {
+    return _bsh_dict[index];
+};
+`;
+            
+            const obfuscatedCode = `
+/* Obfuscation de Style Professionnel (String Array - BSH Zone) */
+(function() {
+    ${decoderFunction}
+
+    // Le code utilisateur obfusqué
+    const _var_0 = _bsh_g(3); 
+    const _var_1 = _bsh_g(1); // 'log'
+
+    // Exécution du code (utilisation d'eval)
+    eval(_var_0); 
+    
+    // Simuler l'affichage pour montrer que le code a été exécuté.
+    console[_var_1]('Code exécuté avec succès. Longueur: ' + _var_0.length);
+})();
+`;
+            return obfuscatedCode;
+        }
+
+        // NOUVELLE FONCTION (RÉVISÉE) : Obfuscation String Array Pro (Masque les fonctions internes)
+        // UTILISE SEULEMENT L'ENCODAGE BASE64, PAS DE CRYPTAGE MATHÉMATIQUE.
+        function stringArrayProObfuscator(text) {
+            if (!text) return "// Entrez du code ou du texte (ex: console.log('Hello');) pour commencer l'obfuscation String Array Pro.";
+
+            // 1. Préparation du tableau de chaînes (String Array)
+            const originalString = text;
+            const obfuscatedStrings = [
+                'eval', // Index 0
+                'log',  // Index 1
+                'Code exécuté avec succès. Longueur: ', // Index 2
+                originalString // Index 3
+            ];
+            
+            // 2. Encodage Base64 du tableau
+            const base64EncodedArray = base64EncodeSafe(JSON.stringify(obfuscatedStrings));
+            
+            // 3. Définition des Noms de Variables Hexadécimales (style Obfuscator.io)
+            const VAR_DICT = '_0x3d0a4c';
+            const FUNC_DECODE = '_0x9f1b2e';
+            const KEY_EVAL = '_0x6c7d8f';
+            const KEY_LOG = '_0xa1b2c3';
+            const KEY_SOURCE = '_0x4e5f60';
+            const VAR_LOG_MSG = '_0x7a8b9c';
+
+            // 4. Routine de décodage + Fonction d'accès (Intégration de la fonction de décodage Base64)
+            const decoderRoutine = `
+// Décodeur Base64 Sécurisé intégré
+const base64DecodeSafe = function(base64) {
+    const binaryString = atob(base64);
+    const decoded_utf8 = decodeURIComponent(binaryString.split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return decoded_utf8;
+};
+
+const ${VAR_DICT} = (function() {
+    const _bsh_base64 = "${base64EncodedArray}";
+    try {
+        const decoded_json_string = base64DecodeSafe(_bsh_base64);
+        return JSON.parse(decoded_json_string);
+    } catch (e) {
+        return ['ArrayError','ArrayError','ArrayError', 'ArrayError'];
+    }
+})();
+
+const ${FUNC_DECODE} = function(index) {
+    return ${VAR_DICT}[index];
+};
+`;
+            
+            // 5. Assemblage du code obfusqué
+            const obfuscatedCode = `
+/* * 🔒 BSH ZONE : OBFO-STRINGARRAY-PRO (Pure Obfuscation Style Obfuscator.io) 
+ * Masque les chaînes et les noms de fonctions critiques (eval/log)
+ */
+(function() {
+    ${decoderRoutine}
+
+    // Récupération des fonctions critiques via le tableau par index
+    const ${KEY_EVAL} = window[${FUNC_DECODE}(0)] || window['eval']; 
+    const ${KEY_LOG} = ${FUNC_DECODE}(1); 
+    const ${VAR_LOG_MSG} = ${FUNC_DECODE}(2);
+
+    // Accès à la chaîne du code source par index
+    const ${KEY_SOURCE} = ${FUNC_DECODE}(3); 
+    
+    // Exécution du code masqué
+    try {
+        ${KEY_EVAL}(${KEY_SOURCE}); 
+        
+        // Simuler l'affichage de succès
+        console[${KEY_LOG}](${VAR_LOG_MSG} + ${KEY_SOURCE}.length);
+    } catch (e) {
+        console['error']('❌ String Array Pro Erreur: Échec de l\\'exécution.', e);
+    }
+})();
+`;
+            return obfuscatedCode;
+        }
+
+        // FONCTION Obfuscation CJK (Unicode pur) - CONSERVÉE
+        function cjkObfuscator(text) {
+            if (!text) return "// Entrez du code ou du texte pour commencer l'obfuscation CJK.";
+
+            // 1. Définition des Noms en Caractères Chinois/Unicode
+            const sourceCodeVar = '機密ソースコード'; // Chinois: "Jīmì Sōusī Kèdé" - Code source secret
+            const evalFunc = '実行評価';         // Japonais: "Jikkou hyouka" - Exécuter l'évaluation
+            
+            // 2. Échapper le code source pour qu'il soit une chaîne de caractères JavaScript valide
+            const escapedText = JSON.stringify(text); 
+            
+            // 3. Script d'injection / Décodeur
+            const obfuscatedCode = `
+/* * 🇯🇵 Obfuscation CJK (Unicode pur) - BSH Zone 
+ * Le code source n'est PAS en Base64, mais est caché comme la valeur
+ * d'une variable nommée en CJK, puis exécuté par 'eval' masqué.
+ */
+
+// Le code source est directement visible, mais dans une variable illisible.
+const ${sourceCodeVar} = ${escapedText};
+
+// L'exécution (eval) est masquée ou renommée
+const ${evalFunc} = window['eval']; 
+    
+// Exécution du code décodé (Méthode d'obfuscation)
+try {
+    ${evalFunc}(${sourceCodeVar});
+    console.log('✅ CJK Obfuscation: Code source visible mais exécuté par une variable illisible. Longueur: ' + ${sourceCodeVar}.length);
+} catch (e) {
+    console.error('❌ Erreur CJK: Échec de l\\'exécution. Assurez-vous que le code source est valide.', e);
+}
+`;
+            return obfuscatedCode;
+        }
+
+        // FONCTION Obfuscation Base64 simple (Pour l'option ObfuscationEncode)
+        function obfuscationEncodeCipher(text) {
+             if (!text) return "// Entrez du code ou du texte (ex: console.log('Hello');) pour commencer l'obfuscation Base64.";
+             const base64 = base64EncodeSafe(text);
+             // La fonction base64DecodeSafe est considérée comme définie globalement ici pour ce mode simple
+             return `/* Obfuscation Base64 Simple (BSH Zone) */\nconst _base64 = '${base64}';\neval(base64DecodeSafe(_base64));\n// Note: La fonction base64DecodeSafe doit être définie dans votre environnement.`;
+        }
+
+
+        // --- VARIABLES ET SÉLECTION DOM (INCHANGÉE) ---
+
+        let currentCipher = 'Vigenere'; 
+
+        const body = document.getElementById('body');
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const cipherTitle = document.getElementById('cipherTitle');
+        const cipherDescription = document.getElementById('cipherDescription');
+
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+
+        const keyInputContainer = document.getElementById('keyInputContainer');
+        const keyLabel = document.getElementById('keyLabel');
+        const keyInput = document.getElementById('keyInput');
+
+        const keyInputBContainer = document.getElementById('keyInputBContainer');
+        const keyInputB = document.getElementById('keyInputB');
+
+        const encryptButton = document.getElementById('encryptButton'); 
+
+        const zipUploadContainer = document.getElementById('zipUploadContainer');
+        const zipFileInput = document.getElementById('zipFileInput');
+        const zipInfo = document.getElementById('zipInfo');
+
+        const resultActions = document.getElementById('resultActions');
+        const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const statusMessage = document.getElementById('statusMessage');
+
+        const cipherCardsContainer = document.getElementById('cipherCardsContainer');
+
+
+        // --- UTILITAIRES / ALGOS DE CHIFFREMENT/ENCODAGE (INCHANGÉS) ---
+
+        function vigenereCipher(text, key, mode = 'encrypt') {
+            const cleanedKey = key.toUpperCase().replace(/[^A-Z]/g, '');
+            if (cleanedKey.length === 0) return "KEY_ERROR"; 
+            let result = '';
+            let keyIndex = 0; 
+            const keyLength = cleanedKey.length;
+            const direction = mode === 'encrypt' ? 1 : -1; 
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                let charCode = text.charCodeAt(i);
+                let isUpperCase = (charCode >= 65 && charCode <= 90); 
+                let isLowerCase = (charCode >= 97 && charCode <= 122); 
+                if (isUpperCase || isLowerCase) {
+                    const keyCharShift = (cleanedKey.charCodeAt(keyIndex % keyLength) - 65) * direction; 
+                    let base = isUpperCase ? 65 : 97; 
+                    let originalPos = charCode - base; 
+                    let newPos = (originalPos + keyCharShift + 26) % 26; 
+                    result += String.fromCharCode(newPos + base);
+                    keyIndex++;
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        function caesarCipher(text, shift, mode = 'encrypt') {
+            const numShift = parseInt(shift) * (mode === 'encrypt' ? 1 : -1);
+            if (isNaN(numShift)) return "KEY_ERROR";
+            let result = '';
+            const finalShift = (numShift % 26 + 26) % 26; 
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i);
+                let base = 0;
+                if (charCode >= 65 && charCode <= 90) { base = 65; } 
+                else if (charCode >= 97 && charCode <= 122) { base = 97; } 
+                else { result += text[i]; continue; }
+                let originalPos = charCode - base;
+                let newPos = (originalPos + finalShift) % 26;
+                result += String.fromCharCode(newPos + base);
+            }
+            return result;
+        }
+
+        function rot13Cipher(text) {
+            return caesarCipher(text, 13, 'encrypt');
+        }
+
+        function affineCipher(text, a, b, mode = 'encrypt') {
+            const A = parseInt(a);
+            const B = parseInt(b);
+            if (isNaN(A) || isNaN(B) || A < 1 || A > 25 || B < 0 || B > 25) return "KEY_ERROR";
+            if ([1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25].indexOf(A) === -1) return "KEY_ERROR_A"; 
+            let result = '';
+            let A_inv = 0;
+            if (mode === 'decrypt') {
+                for (let i = 0; i < 26; i++) {
+                    if ((A * i) % 26 === 1) { A_inv = i; break; }
+                }
+            }
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i);
+                let base = 0;
+                if (charCode >= 65 && charCode <= 90) { base = 65; } 
+                else if (charCode >= 97 && charCode <= 122) { base = 97; } 
+                else { result += text[i]; continue; }
+                let x = charCode - base;
+                let y;
+                if (mode === 'encrypt') { y = (A * x + B) % 26; } 
+                else { y = (A_inv * (x - B + 26)) % 26; }
+                result += String.fromCharCode(y + base);
+            }
+            return result;
+        }
+
+        function substitutionCipher(text, key, mode = 'encrypt') {
+            const cleanedKey = key.toUpperCase().replace(/[^A-Z]/g, '');
+            if (cleanedKey.length !== 26 || new Set(cleanedKey).size !== 26) return "KEY_ERROR";
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const keyMap = mode === 'encrypt' 
+                ? Array.from(alphabet).reduce((map, char, i) => { map[char] = cleanedKey[i]; return map; }, {})
+                : Array.from(cleanedKey).reduce((map, char, i) => { map[char] = alphabet[i]; return map; }, {});
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const upperChar = char.toUpperCase();
+                if (alphabet.includes(upperChar)) {
+                    const substitutedChar = keyMap[upperChar];
+                    result += (char === upperChar) ? substitutedChar : substitutedChar.toLowerCase();
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+        
+        function base64Cipher(text) {
+            return base64EncodeSafe(text);
+        }
+
+
+        // --- GESTION DES MODES DE CHIFFREMENT (UI - INCHANGÉE) ---
+
+        function updateCipherUI(cipherName) {
+            currentCipher = cipherName;
+            
+            // Réinitialisation
+            outputText.value = '';
+            statusMessage.innerHTML = '';
+            toggleResultActions('');
+            keyInputBContainer.classList.add('hidden');
+            keyInputContainer.classList.remove('hidden'); 
+            zipInfo.classList.add('hidden'); 
+            
+            // Logique de sélection de la carte stylisée
+            document.querySelectorAll('.other-cipher-card').forEach(card => {
+                card.classList.remove('cipher-card-selected');
+                card.querySelector('button').textContent = 'Utiliser';
+                card.querySelector('button').classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'bg-indigo-700', 'hover:bg-indigo-800', 'bg-cyan-600');
+                card.querySelector('button').classList.add('bg-cyan-700', 'hover:bg-cyan-800');
+                card.querySelector('button').classList.remove('shadow-md');
+            });
+            const activeCard = document.getElementById(cipherName);
+            activeCard.classList.add('cipher-card-selected');
+            activeCard.querySelector('button').textContent = 'Mode Actif';
+            
+            // Mise à jour de l'UI
+            switch (cipherName) {
+                case 'Vigenere':
+                    cipherTitle.textContent = "Outil Vigenère (Cryptage)";
+                    cipherDescription.textContent = "Mode actuel : Chiffrement Vigenère. Cryptez votre texte ou un fichier ZIP avec un mot de passe (clé textuelle).";
+                    keyLabel.textContent = "Mot de Passe (Clé Textuelle)";
+                    keyInput.type = "text";
+                    keyInput.value = "SECRET";
+                    encryptButton.textContent = "Crypter le Message";
+                    activeCard.querySelector('button').classList.remove('bg-cyan-700', 'hover:bg-cyan-800');
+                    activeCard.querySelector('button').classList.add('bg-cyan-600', 'shadow-md');
+                    break;
+                case 'Caesar':
+                    cipherTitle.textContent = "Outil Chiffrement de César (Cryptage)";
+                    cipherDescription.textContent = "Mode actuel : Chiffrement de César. Chiffrement par décalage numérique simple.";
+                    keyLabel.textContent = "Décalage (0-25)";
+                    keyInput.type = "number";
+                    keyInput.value = "3";
+                    encryptButton.textContent = "Crypter le Message";
+                    break;
+                case 'ROT13':
+                    cipherTitle.textContent = "Outil Chiffrement ROT13 (Cryptage)";
+                    cipherDescription.textContent = "Mode actuel : Chiffrement ROT13. Cas spécial de César, décalage fixe de 13 positions.";
+                    keyInputContainer.classList.add('hidden'); 
+                    encryptButton.textContent = "Crypter le Message";
+                    break;
+                case 'Affine':
+                    cipherTitle.textContent = "Outil Chiffrement Affine (Cryptage)";
+                    cipherDescription.textContent = "Mode actuel : Chiffrement Affine. Utilise deux clés numériques A (multiplicative) et B (additive).";
+                    keyLabel.textContent = "Clé Additive (B: 0-25)";
+                    keyInput.type = "number";
+                    keyInput.value = "3";
+                    keyInputBContainer.classList.remove('hidden'); 
+                    encryptButton.textContent = "Crypter le Message";
+                    break;
+                case 'Substitution':
+                    cipherTitle.textContent = "Outil Chiffrement par Substitution (Cryptage)";
+                    cipherDescription.textContent = "Mode actuel : Chiffrement par Substitution. Chaque lettre est remplacée selon une clé de 26 lettres.";
+                    keyLabel.textContent = "Clé de Substitution (26 lettres uniques)";
+                    keyInput.type = "text";
+                    keyInput.value = "QWERTYUIOPASDFGHJKLZXCVBNM";
+                    encryptButton.textContent = "Crypter le Message";
+                    break;
+                case 'Base64':
+                    cipherTitle.textContent = "Outil Encodage Base64 (Encodage)";
+                    cipherDescription.textContent = "Mode actuel : Encodage Base64. Convertit le texte en un format de chaîne Base64 pour le transport de données binaires.";
+                    keyInputContainer.classList.add('hidden'); 
+                    encryptButton.textContent = "Encoder le Message";
+                    activeCard.querySelector('button').textContent = 'Mode Actif (Encodage)';
+                    activeCard.querySelector('button').classList.remove('bg-cyan-700', 'hover:bg-cyan-800');
+                    activeCard.querySelector('button').classList.add('bg-cyan-600', 'shadow-md');
+                    break;
+                
+                // --- OBFUSCATION ---
+                case 'ObfuscationStringArray':
+                    cipherTitle.textContent = "Outil Obfuscation (String Array)";
+                    cipherDescription.textContent = "Mode actuel : Obfuscation Professionnelle. Cache toutes les chaînes d'entrée dans un tableau chiffré, style Obfuscator.io (variables hexadécimales).";
+                    keyInputContainer.classList.add('hidden'); 
+                    encryptButton.textContent = "Obfusquer (String Array)";
+                    activeCard.querySelector('button').textContent = 'Mode Actif (Obfusquer)';
+                    activeCard.querySelector('button').classList.remove('bg-cyan-700', 'hover:bg-cyan-800');
+                    activeCard.querySelector('button').classList.add('bg-indigo-600', 'shadow-md');
+                    break;
+                case 'ObfuscationStringArrayPro':
+                    cipherTitle.textContent = "Outil Obfuscation (String Array Pro) 🔒";
+                    cipherDescription.textContent = "Mode actuel : Obfuscation String Array Avancée. Masque toutes les chaînes **y compris les fonctions critiques (eval, log)** en Base64/Tableau chiffré.";
+                    keyInputContainer.classList.add('hidden'); 
+                    encryptButton.textContent = "Obfusquer (String Array Pro)";
+                    activeCard.querySelector('button').textContent = 'Mode Actif (Obfusquer)';
+                    activeCard.querySelector('button').classList.remove('bg-cyan-700', 'hover:bg-cyan-800');
+                    activeCard.querySelector('button').classList.add('bg-indigo-600', 'shadow-md');
+                    break;
+                case 'ObfuscationCJK':
+                    cipherTitle.textContent = "Outil Obfuscation (CJK / Unicode) 🇯🇵";
+                    cipherDescription.textContent = "Mode actuel : Obfuscation CJK. Remplace le code par des variables en **caractères illisibles (Chinois/Japonais)** SANS Base64 (code source directement exposé en valeur).";
+                    keyInputContainer.classList.add('hidden'); 
+                    encryptButton.textContent = "Obfusquer (CJK)";
+                    activeCard.querySelector('button').classList.remove('bg-cyan-700', 'hover:bg-cyan-800');
+                    activeCard.querySelector('button').classList.add('bg-indigo-600', 'shadow-md');
+                    break;
+                case 'ObfuscationEncode':
+                    cipherTitle.textContent = "Outil Obfuscation (Base64 Eval)";
+                    cipherDescription.textContent = "Mode actuel : Obfuscation. Encode le texte d'entrée en Base64 et exécution par 'eval'. Utile pour les scripts (sans clé).";
+                    keyInputContainer.classList.add('hidden'); 
+                    encryptButton.textContent = "Obfusquer (Base64 Eval)";
+                    activeCard.querySelector('button').classList.remove('bg-cyan-700', 'hover:bg-cyan-800');
+                    activeCard.querySelector('button').classList.add('bg-indigo-600', 'shadow-md');
+                    break;
+                case 'ObfuscationDistract':
+                    cipherTitle.textContent = "Outil Obfuscation (Code Mort/Distraction)";
+                    cipherDescription.textContent = "Mode actuel : Obfuscation. Ajoute du code mort (variables inutiles) autour du texte pour simuler une pollution de code.";
+                    keyLabel.textContent = "Texte/Mot clé pour la Distraction";
+                    keyInput.type = "text";
+                    keyInput.value = "CRITICAL_PHRASE";
+                    encryptButton.textContent = "Obfusquer (Distraire)";
+                    activeCard.querySelector('button').classList.remove('bg-cyan-700', 'hover:bg-cyan-800');
+                    activeCard.querySelector('button').classList.add('bg-indigo-600', 'shadow-md');
+                    break;
+                case 'ObfuscationSplit':
+                    cipherTitle.textContent = "Outil Obfuscation (Division de Chaîne)";
+                    cipherDescription.textContent = "Mode actuel : Obfuscation. Divise le message en tableau de caractères JavaScript, puis le recombine.";
+                    keyInputContainer.classList.add('hidden'); 
+                    encryptButton.textContent = "Obfusquer (Split)";
+                    activeCard.querySelector('button').classList.remove('bg-cyan-700', 'hover:bg-cyan-800');
+                    activeCard.querySelector('button').classList.add('bg-indigo-600', 'shadow-md');
+                    break;
+            }
+        }
+        
+        cipherCardsContainer.addEventListener('click', (event) => {
+            const card = event.target.closest('.other-cipher-card');
+            if (card && card.dataset.cipher) {
+                updateCipherUI(card.dataset.cipher);
+            }
+        });
+
+
+        // --- GESTION DU CHIFFREMENT GLOBAL (LOGIQUE MISE À JOUR) ---
+
+        function handleCipherAction() {
+            const mode = 'encrypt'; 
+            let text = inputText.value;
+            const key = keyInput.value;
+            let encryptedText = '';
+            let keyB = keyInputB.value; 
+
+            // Vérifications d'entrée
+            const isObfuscationMode = currentCipher.includes('Obfuscation');
+
+            if (!text && !isObfuscationMode) {
+                showStatus("Veuillez entrer du texte à crypter/obfusquer/encoder.", 'error');
+                outputText.value = "";
+                toggleResultActions("");
+                return;
+            }
+            if (!text && isObfuscationMode) {
+                // Utilisation d'un placeholder pour l'obfuscation si la zone de texte est vide.
+                text = "console.log('Ceci est la fonction critique à masquer.');"; 
+            }
+            
+            try {
+                switch (currentCipher) {
+                    case 'Vigenere':
+                        encryptedText = vigenereCipher(text, key, mode);
+                        if (encryptedText === "KEY_ERROR") throw new Error("Clé Vigenère invalide (doit contenir des lettres).");
+                        break;
+                    case 'Caesar':
+                        encryptedText = caesarCipher(text, key, mode);
+                        if (encryptedText === "KEY_ERROR") throw new Error("Décalage César invalide (doit être un nombre).");
+                        break;
+                    case 'ROT13':
+                        encryptedText = rot13Cipher(text);
+                        break;
+                    case 'Affine':
+                        encryptedText = affineCipher(text, keyB, key, mode);
+                        if (encryptedText === "KEY_ERROR") throw new Error("Clés Affine invalides (doivent être des nombres 0-25).");
+                        if (encryptedText === "KEY_ERROR_A") throw new Error("Clé A (multiplicative) doit être coprime de 26.");
+                        break;
+                    case 'Substitution':
+                        encryptedText = substitutionCipher(text, key, mode);
+                        if (encryptedText === "KEY_ERROR") throw new Error("Clé de Substitution invalide (doit contenir 26 lettres uniques A-Z).");
+                        break;
+                    case 'Base64': 
+                        encryptedText = base64Cipher(text);
+                        break;
+                    
+                    // --- OBFUSCATION ---
+                    case 'ObfuscationStringArray':
+                        encryptedText = stringArrayObfuscator(text);
+                        break;
+                    case 'ObfuscationStringArrayPro':
+                        encryptedText = stringArrayProObfuscator(text); 
+                        break;
+                    case 'ObfuscationCJK':
+                        encryptedText = cjkObfuscator(text); 
+                        break;
+                    case 'ObfuscationEncode':
+                        encryptedText = obfuscationEncodeCipher(text);
+                        break;
+                    case 'ObfuscationDistract':
+                        const distractionCode = createDistractionCode(key, 100);
+                        encryptedText = distractionCode + "\n\n/* REAL CODE START */\n" + text + "\n/* REAL CODE END */\n\n" + distractionCode;
+                        break;
+                    case 'ObfuscationSplit':
+                        encryptedText = stringSplitObfuscator(text);
+                        break;
+                }
+            } catch (e) {
+                 showStatus("Erreur : " + e.message, 'error');
+                 outputText.value = "";
+                 toggleResultActions("");
+                 return;
+            }
+
+            const actionType = isObfuscationMode ? 'obfusqué' : (currentCipher === 'Base64' ? 'encodé' : 'crypté');
+            outputText.value = encryptedText;
+            showStatus(`Message ${actionType} avec succès !`);
+            toggleResultActions(encryptedText);
+        }
+
+        encryptButton.addEventListener('click', handleCipherAction);
+
+
+        // --- LOGIQUE ZIP (INCHANGÉE) ---
+        
+        zipFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.type !== 'application/zip') {
+                    showStatus("Veuillez sélectionner un fichier ZIP valide.", 'error');
+                    zipInfo.classList.add('hidden');
+                    inputText.value = '';
+                    zipFileInput.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64Content = e.target.result.split(',')[1]; 
+                    inputText.value = base64Content; 
+                    
+                    const isEncodingMode = currentCipher === 'Base64' || currentCipher.includes('Obfuscation');
+                    const infoMessage = isEncodingMode 
+                        ? `Fichier "${file.name}" chargé et encodé en Base64. (Le mode actuel est un encodage ou une obfuscation.)`
+                        : `Fichier "${file.name}" chargé et encodé en Base64. Le chiffrement ${currentCipher} sera appliqué sur la Base64.`;
+
+                    showStatus(infoMessage, 'info');
+                    
+                    zipInfo.classList.remove('hidden');
+                    toggleResultActions('');
+                    
+                    zipFileInput.value = ''; 
+                };
+                reader.readAsDataURL(file); 
+            }
+        });
+
+
+        // --- LOGIQUE DE BASE (Thème, Copier/Télécharger - INCHANGÉE) ---
+
+        if (localStorage.getItem('theme') === 'light') setTheme('light'); else setTheme('dark');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.classList.contains('theme-dark') ? 'dark' : 'light';
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        function setTheme(theme) {
+            const htmlTag = document.documentElement; 
+
+            if (theme === 'light') {
+                body.classList.remove('theme-dark'); body.classList.add('theme-light');
+                htmlTag.style.backgroundColor = '#f3f4f6'; 
+                moonIcon.classList.add('hidden'); sunIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.remove('theme-light'); body.classList.add('theme-dark');
+                htmlTag.style.backgroundColor = '#0d1117'; 
+                sunIcon.classList.add('hidden'); moonIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Messages d'état stylisés
+        function showStatus(message, type = 'success') {
+            let baseClasses = 'p-3 rounded-xl text-sm font-medium transition duration-300 ease-in-out shadow-lg flex items-center justify-center gap-2 transform hover:scale-[1.01]';
+            let icon, colorClasses;
+            if (type === 'success') { colorClasses = 'bg-green-600 hover:bg-green-700 text-white'; icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>'; } 
+            else if (type === 'error') { colorClasses = 'bg-red-600 hover:bg-red-700 text-white'; icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.3 16c-.77 1.333.192 3 1.732 3z" /></svg>'; } 
+            else if (type === 'info') { colorClasses = 'bg-blue-600 hover:bg-blue-700 text-white'; icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'; }
+            else { colorClasses = 'bg-blue-600 hover:bg-blue-700 text-white'; icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'; }
+
+            statusMessage.innerHTML = `<div class="${baseClasses} ${colorClasses}">${icon}<span>${message}</span></div>`;
+            setTimeout(() => { statusMessage.innerHTML = ''; }, 6000); 
+        }
+
+        // Affichage des actions avec transition
+        function toggleResultActions(text) {
+             if (text.length > 0) {
+                resultActions.classList.remove('opacity-0', 'invisible');
+                resultActions.classList.add('opacity-100', 'visible');
+            } else {
+                resultActions.classList.remove('opacity-100', 'visible');
+                resultActions.classList.add('opacity-0', 'invisible');
+            }
+        }
+        
+        copyButton.addEventListener('click', () => {
+            outputText.select(); 
+            document.execCommand('copy'); 
+            showStatus("Résultat copié dans le presse-papiers ! 📋", 'success');
+        });
+        
+        downloadButton.addEventListener('click', () => {
+            const encryptedText = outputText.value;
+            if (!encryptedText) {
+                showStatus("Aucun résultat à télécharger.", 'error');
+                return;
+            }
+            const blob = new Blob([encryptedText], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `message_${currentCipher.toLowerCase()}_bsh.txt`; 
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showStatus("Fichier téléchargé avec succès ! 💾");
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCipherUI('Vigenere');
+        });
+
+    </script>
+</body>
+</html>
